@@ -6,9 +6,9 @@ import openai
 app = Flask(__name__)
 
 # Configurações - Substitua pelos seus dados
-ZAPI_TOKEN = 'SEU_TOKEN_ZAPI'
-ZAPI_PHONE_ID = 'SEU_PHONE_ID'  # Exemplo: '5531999999999'
-OPENAI_API_KEY = 'SUA_OPENAI_API_KEY'
+ZAPI_TOKEN = '06494CCF4713B1147443184B'
+ZAPI_PHONE_ID = '5577998535209'
+OPENAI_API_KEY = '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'
 
 openai.api_key = OPENAI_API_KEY
 
