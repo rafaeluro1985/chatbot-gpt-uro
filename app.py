@@ -29,8 +29,8 @@ def webhook():
         mensagem = data['message']['body']
         numero = data['message']['from']
     elif 'data' in data:
-        mensagem = data['data']['msg']
-        numero = data['data']['phone']
+        mensagem = data['text']['message']
+        numero = data['phone']
     elif 'body' in data and 'phone' in data:
         mensagem = data['body']
         numero = data['phone']
