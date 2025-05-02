@@ -1,16 +1,15 @@
-
 from flask import Flask, request, jsonify
 import requests
-import openai
+from openai import OpenAI
 
 app = Flask(__name__)
 
 # Configurações - Substitua pelos seus dados
-ZAPI_TOKEN = '06494CCF4713B1147443184B'
-ZAPI_PHONE_ID = '5577998535209'
-OPENAI_API_KEY = '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'
+ZAPI_TOKEN = 'SEU_TOKEN_ZAPI'
+ZAPI_PHONE_ID = 'SEU_PHONE_ID'  # Exemplo: '5531999999999'
+OPENAI_API_KEY = 'SUA_OPENAI_API_KEY'
 
-openai.api_key = OPENAI_API_KEY
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Prompt seguro para restringir as respostas
 PROMPT_SISTEMA = (
@@ -22,27 +21,17 @@ PROMPT_SISTEMA = (
 @app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.get_json()
-    print("DEBUG - Recebido:", data)  # <-- Adiciona esse log para ver o que chega
+    print("DEBUG - Recebido:", data)
 
-    # Tenta acessar as chaves mais básicas
-    if 'message' in data:
-        mensagem = data['message']['body']
-        numero = data['message']['from']
-    elif 'data' in data:
+    try:
         mensagem = data['text']['message']
         numero = data['phone']
-    elif 'body' in data and 'phone' in data:
-        mensagem = data['body']
-        numero = data['phone']
-    else:
-        mensagem = "Mensagem não reconhecida"
-        numero = "Número não reconhecido"
+    except KeyError:
+        print("DEBUG - Estrutura inesperada:", data)
+        return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # ... (segue igual com o resto do código)
-
-
-    # Chamada à OpenAI
-    resposta_gpt = openai.ChatCompletion.create(
+    # Chamada atualizada para OpenAI API
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": PROMPT_SISTEMA},
@@ -50,7 +39,7 @@ def webhook():
         ]
     )
 
-    resposta_final = resposta_gpt['choices'][0]['message']['content']
+    resposta_final = response.choices[0].message.content
 
     # Enviar resposta pelo WhatsApp (Z-API)
     url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/token/{ZAPI_TOKEN}/send-text'
