@@ -9,7 +9,10 @@ ZAPI_TOKEN = 'SEU_TOKEN_ZAPI'
 ZAPI_PHONE_ID = 'SEU_PHONE_ID'  # Exemplo: '5531999999999'
 OPENAI_API_KEY = 'SUA_OPENAI_API_KEY'
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(
+    api_key=OPENAI_API_KEY,
+    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"
+)	
 
 # Prompt seguro para restringir as respostas
 PROMPT_SISTEMA = (
