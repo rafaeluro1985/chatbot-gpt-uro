@@ -22,8 +22,24 @@ PROMPT_SISTEMA = (
 @app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.get_json()
-    mensagem = data['data']['msg']
-    numero = data['data']['phone']
+    print("DEBUG - Recebido:", data)  # <-- Adiciona esse log para ver o que chega
+
+    # Tenta acessar as chaves mais básicas
+    if 'message' in data:
+        mensagem = data['message']['body']
+        numero = data['message']['from']
+    elif 'data' in data:
+        mensagem = data['data']['msg']
+        numero = data['data']['phone']
+    elif 'body' in data and 'phone' in data:
+        mensagem = data['body']
+        numero = data['phone']
+    else:
+        mensagem = "Mensagem não reconhecida"
+        numero = "Número não reconhecido"
+
+    # ... (segue igual com o resto do código)
+
 
     # Chamada à OpenAI
     resposta_gpt = openai.ChatCompletion.create(
