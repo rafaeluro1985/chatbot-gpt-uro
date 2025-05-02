@@ -22,8 +22,8 @@ PROMPT_SISTEMA = (
 @app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.get_json()
-    mensagem = data['message']['body']
-    numero = data['message']['from']
+    mensagem = data['data']['msg']
+    numero = data['data']['phone']
 
     # Chamada à OpenAI
     resposta_gpt = openai.ChatCompletion.create(
