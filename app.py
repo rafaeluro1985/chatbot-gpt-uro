@@ -1,18 +1,19 @@
 from flask import Flask, request, jsonify
 import requests
 from openai import OpenAI
+import os  # para acessar variáveis de ambiente
 
 app = Flask(__name__)
 
-# Configurações - Substitua pelos seus dados
-ZAPI_TOKEN = 'SEU_TOKEN_ZAPI'
-ZAPI_PHONE_ID = 'SEU_PHONE_ID'
-OPENAI_API_KEY = 'SUA_OPENAI_API_KEY'
+# Configurações - Pegando dados das variáveis de ambiente
+ZAPI_TOKEN = os.environ.get('ZAPI_TOKEN')
+ZAPI_PHONE_ID = os.environ.get('ZAPI_PHONE_ID')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"
-)	
+    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"  # Coloque seu Project ID real aqui
+)
 
 # Prompt seguro para restringir as respostas
 PROMPT_SISTEMA = (
