@@ -5,9 +5,9 @@ from openai import OpenAI
 app = Flask(__name__)
 
 # Configurações - Substitua pelos seus dados
-ZAPI_TOKEN = os.environ.get('ZAPI_TOKEN')
-ZAPI_PHONE_ID = os.environ.get('ZAPI_PHONE_ID')
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+ZAPI_TOKEN = 'SEU_TOKEN_ZAPI'
+ZAPI_PHONE_ID = 'SEU_PHONE_ID'
+OPENAI_API_KEY = 'SUA_OPENAI_API_KEY'
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
