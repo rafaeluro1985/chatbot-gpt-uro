@@ -1,17 +1,18 @@
 from flask import Flask, request, jsonify
 import requests
 from openai import OpenAI
-import os  # para acessar variáveis de ambiente
+import os
 
 app = Flask(__name__)
 
 # Configurações - Pegando dados das variáveis de ambiente
-WATI_TOKEN = os.environ.get('WATI_TOKEN')  # Token da WATI
+WATI_API_URL = os.environ.get('WATI_API_URL')  # Ex: https://live-server.wati.io/api/v1/sendSessionMessage
+WATI_API_KEY = os.environ.get('WATI_API_KEY')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"  # Substitua pelo seu Project ID se necessário
+    project=os.environ.get('OPENAI_PROJECT_ID')  # Opcional, só use se estiver usando o Project ID
 )
 
 # Prompt seguro para restringir as respostas
@@ -28,12 +29,12 @@ def webhook():
 
     try:
         mensagem = data['text']['message']
-        numero = data['phone']  # já no formato internacional (ex: 557798717214)
+        numero = data['phone']
     except KeyError:
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada para OpenAI API
+    # Chamada atualizada para OpenAI API
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -44,17 +45,18 @@ def webhook():
 
     resposta_final = response.choices[0].message.content
 
-    # Enviar resposta pelo WhatsApp usando a API do WATI
-    url = 'https://live-server.wati.io/api/v1/sendSessionMessage'
+    # Enviar resposta pelo WhatsApp (WATI)
     headers = {
-        'Authorization': f'Bearer {WATI_TOKEN}',
+        'Authorization': f'Bearer {WATI_API_KEY}',
         'Content-Type': 'application/json'
     }
+
     payload = {
-        'phone': numero,
+        'phone': numero,  # Deve estar no formato internacional, ex: 5571999999999
         'message': resposta_final
     }
-    response_wati = requests.post(url, headers=headers, json=payload)
+
+    response_wati = requests.post(WATI_API_URL, json=payload, headers=headers)
     print("DEBUG - WATI status code:", response_wati.status_code)
     print("DEBUG - WATI response text:", response_wati.text)
 
