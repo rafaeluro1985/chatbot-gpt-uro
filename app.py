@@ -6,8 +6,8 @@ import os
 app = Flask(__name__)
 
 # Configurações - Pegando dados das variáveis de ambiente
-WATI_API_URL = os.environ.get('WATI_API_URL')  # Ex: https://live-server.wati.io/api/v1/sendSessionMessage
-WATI_API_KEY = os.environ.get('WATI_API_KEY')
+WATI_API_URL = os.environ.get('WATI_API_URL')  # Exemplo: https://live-server.wati.io/api/v1/message
+WATI_TOKEN = os.environ.get('WATI_TOKEN')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
@@ -34,7 +34,7 @@ def webhook():
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada atualizada para OpenAI API
+    # Chamada para OpenAI API
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -47,7 +47,7 @@ def webhook():
 
     # Enviar resposta pelo WhatsApp (WATI)
     headers = {
-        'Authorization': f'Bearer {WATI_API_KEY}',
+        'Authorization': f'Bearer {WATI_TOKEN}',
         'Content-Type': 'application/json'
     }
 
