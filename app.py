@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify
 import requests
 from openai import OpenAI
-import os
+import os  # para acessar variáveis de ambiente
 
 app = Flask(__name__)
 
-# Variáveis de ambiente
-ZAPI_TOKEN = os.environ.get('ZAPI_TOKEN')
-ZAPI_PHONE_ID = os.environ.get('ZAPI_PHONE_ID')
+# Configurações fixas (como você mandou agora)
+ZAPI_INSTANCE_ID = '3E08FBA3757CA0CDD8E54AEA87B09735'
+ZAPI_TOKEN = '06494CCF4713B1147443184B'
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
@@ -33,7 +33,7 @@ def webhook():
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada para OpenAI
+    # Chamada OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -45,15 +45,13 @@ def webhook():
     resposta_final = response.choices[0].message.content
 
     # Enviar resposta pelo WhatsApp (Z-API)
-    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/send-text'
+    url = f'https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text'
     payload = {
         'phone': numero,
         'message': resposta_final
     }
-    headers = {
-        'Client-Token': ZAPI_TOKEN
-    }
-    response_zapi = requests.post(url, json=payload, headers=headers)
+
+    response_zapi = requests.post(url, json=payload)
     print("DEBUG - ZAPI status code:", response_zapi.status_code)
     print("DEBUG - ZAPI response text:", response_zapi.text)
 
