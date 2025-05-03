@@ -6,13 +6,13 @@ import os
 app = Flask(__name__)
 
 # Configurações - Pegando dados das variáveis de ambiente
-WATI_API_URL = os.environ.get('WATI_API_URL')  # Exemplo: https://live-server.wati.io/api/v1/message
-WATI_TOKEN = os.environ.get('WATI_TOKEN')
+WATI_API_URL = os.environ.get('WATI_API_URL')  # Ex: https://live-server.wati.io/api/v1/sendSessionMessage
+WATI_TOKEN = os.environ.get('WATI_TOKEN')  # O token completo sem "Bearer" no .env
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project=os.environ.get('OPENAI_PROJECT_ID')  # Opcional, só use se estiver usando o Project ID
+    project=os.environ.get('OPENAI_PROJECT_ID')  # Opcional: só use se tiver um Project ID
 )
 
 # Prompt seguro para restringir as respostas
@@ -34,7 +34,7 @@ def webhook():
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada para OpenAI API
+    # Chamada atualizada para OpenAI API
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -52,7 +52,7 @@ def webhook():
     }
 
     payload = {
-        'phone': numero,  # Deve estar no formato internacional, ex: 5571999999999
+        'phone': numero,  # No formato internacional, ex: 5571999999999
         'message': resposta_final
     }
 
