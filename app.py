@@ -51,9 +51,12 @@ def webhook():
         'phone': numero,
         'message': resposta_final
     }
-    requests.post(url, json=payload)
+    response_zapi = requests.post(url, json=payload)
+    print("DEBUG - ZAPI status code:", response_zapi.status_code)
+    print("DEBUG - ZAPI response text:", response_zapi.text)
 
     return jsonify({'status': 'mensagem enviada'}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
