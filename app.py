@@ -51,7 +51,10 @@ def webhook():
         'phone': numero,
         'message': resposta_final
     }
-    response_zapi = requests.post(url, json=payload)
+    headers = {
+        'Client-Token': ZAPI_TOKEN
+    }
+    response_zapi = requests.post(url, json=payload, headers=headers)
     print("DEBUG - ZAPI status code:", response_zapi.status_code)
     print("DEBUG - ZAPI response text:", response_zapi.text)
 
@@ -59,4 +62,3 @@ def webhook():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
