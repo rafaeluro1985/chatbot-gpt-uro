@@ -6,13 +6,13 @@ import os
 app = Flask(__name__)
 
 # Configurações - Pegando dados das variáveis de ambiente
-WATI_API_URL = os.environ.get('WATI_API_URL')  # Ex: https://live-server.wati.io/api/v1/sendSessionMessage
-WATI_TOKEN = os.environ.get('WATI_TOKEN')  # O token completo sem "Bearer" no .env
+WATI_API_KEY = os.environ.get('WATI_API_KEY')
+WATI_BASE_URL = os.environ.get('WATI_BASE_URL')  # Exemplo: https://live-mt-server.wati.io/437995
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project=os.environ.get('OPENAI_PROJECT_ID')  # Opcional: só use se tiver um Project ID
+    project=os.environ.get('OPENAI_PROJECT_ID')  # Opcional: só usar se você tem um Project ID definido
 )
 
 # Prompt seguro para restringir as respostas
@@ -34,7 +34,7 @@ def webhook():
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada atualizada para OpenAI API
+    # Chamada para a API OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -47,16 +47,18 @@ def webhook():
 
     # Enviar resposta pelo WhatsApp (WATI)
     headers = {
-        'Authorization': f'Bearer {WATI_TOKEN}',
+        'Authorization': f'Bearer {WATI_API_KEY}',
         'Content-Type': 'application/json'
     }
 
     payload = {
-        'phone': numero,  # No formato internacional, ex: 5571999999999
-        'message': resposta_final
+        'messageText': resposta_final
     }
 
-    response_wati = requests.post(WATI_API_URL, json=payload, headers=headers)
+    # Monta a URL correta com tenant ID + número do telefone
+    wati_url = f"{WATI_BASE_URL}/api/v1/sendSessionMessage/{numero}"
+
+    response_wati = requests.post(wati_url, json=payload, headers=headers)
     print("DEBUG - WATI status code:", response_wati.status_code)
     print("DEBUG - WATI response text:", response_wati.text)
 
