@@ -12,12 +12,12 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"  # Coloque seu Project ID real aqui
+    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"  # Seu Project ID real
 )
 
 # Prompt seguro para restringir as respostas
 PROMPT_SISTEMA = (
-    "Você é um assistente virtual médico do Dr. Rafael Silva, urologista. "
+    "Você é um assistente virtual médico do Dr. Rafael Prates, urologista. "
     "Responda apenas sobre locais de atendimento, orientações pós-operatórias e cuidados médicos básicos. "
     "Se a pergunta não estiver relacionada a esses temas, oriente o paciente a entrar em contato com o consultório."
 )
@@ -34,7 +34,7 @@ def webhook():
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada atualizada para OpenAI API
+    # Chamada para OpenAI API
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -45,17 +45,13 @@ def webhook():
 
     resposta_final = response.choices[0].message.content
 
-    # Enviar resposta pelo WhatsApp (Z-API)
-    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/send-message'
+    # Enviar resposta pelo WhatsApp (Z-API) - formato ANTIGO com token na URL
+    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/token/{ZAPI_TOKEN}/send-text'
     payload = {
         'phone': numero,
         'message': resposta_final
     }
-    headers = {
-        'Client-Token': ZAPI_TOKEN
-    }
-
-    response_zapi = requests.post(url, json=payload, headers=headers)
+    response_zapi = requests.post(url, json=payload)
     print("DEBUG - ZAPI status code:", response_zapi.status_code)
     print("DEBUG - ZAPI response text:", response_zapi.text)
 
