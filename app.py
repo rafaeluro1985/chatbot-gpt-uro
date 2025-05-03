@@ -5,16 +5,16 @@ import os  # para acessar variáveis de ambiente
 
 app = Flask(__name__)
 
-# Configurações fixas (como você mandou agora)
-ZAPI_INSTANCE_ID = '3E08FBA3757CA0CDD8E54AEA87B09735'
-ZAPI_TOKEN = '06494CCF4713B1147443184B'
+# Configurações - Pegando dados das variáveis de ambiente
+WATI_TOKEN = os.environ.get('WATI_TOKEN')  # Token da WATI
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"
+    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"  # Substitua pelo seu Project ID se necessário
 )
 
+# Prompt seguro para restringir as respostas
 PROMPT_SISTEMA = (
     "Você é um assistente virtual médico do Dr. Rafael Silva, urologista. "
     "Responda apenas sobre locais de atendimento, orientações pós-operatórias e cuidados médicos básicos. "
@@ -28,12 +28,12 @@ def webhook():
 
     try:
         mensagem = data['text']['message']
-        numero = data['phone']
+        numero = data['phone']  # já no formato internacional (ex: 557798717214)
     except KeyError:
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # Chamada OpenAI
+    # Chamada para OpenAI API
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -44,16 +44,19 @@ def webhook():
 
     resposta_final = response.choices[0].message.content
 
-    # Enviar resposta pelo WhatsApp (Z-API)
-    url = f'https://api.z-api.io/instances/{ZAPI_INSTANCE_ID}/token/{ZAPI_TOKEN}/send-text'
+    # Enviar resposta pelo WhatsApp usando a API do WATI
+    url = 'https://live-server.wati.io/api/v1/sendSessionMessage'
+    headers = {
+        'Authorization': f'Bearer {WATI_TOKEN}',
+        'Content-Type': 'application/json'
+    }
     payload = {
         'phone': numero,
         'message': resposta_final
     }
-
-    response_zapi = requests.post(url, json=payload)
-    print("DEBUG - ZAPI status code:", response_zapi.status_code)
-    print("DEBUG - ZAPI response text:", response_zapi.text)
+    response_wati = requests.post(url, headers=headers, json=payload)
+    print("DEBUG - WATI status code:", response_wati.status_code)
+    print("DEBUG - WATI response text:", response_wati.text)
 
     return jsonify({'status': 'mensagem enviada'}), 200
 
