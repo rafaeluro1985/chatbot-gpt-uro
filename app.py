@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 from openai import OpenAI
-import os
+import os  # para acessar variáveis de ambiente
 
 app = Flask(__name__)
 
@@ -12,9 +12,10 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"
+    project="proj_MwQwbc8w6NFUqAMOaLtXBpUt"  # Coloque seu Project ID real aqui
 )
 
+# Prompt seguro para restringir as respostas
 PROMPT_SISTEMA = (
     "Você é um assistente virtual médico do Dr. Rafael Silva, urologista. "
     "Responda apenas sobre locais de atendimento, orientações pós-operatórias e cuidados médicos básicos. "
@@ -33,7 +34,7 @@ def webhook():
         print("DEBUG - Estrutura inesperada:", data)
         return jsonify({'status': 'estrutura inesperada'}), 400
 
-    # OpenAI API
+    # Chamada atualizada para OpenAI API
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -44,8 +45,8 @@ def webhook():
 
     resposta_final = response.choices[0].message.content
 
-    # Z-API - Correção: envio de token NO CABEÇALHO
-    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/send-text'
+    # Enviar resposta pelo WhatsApp (Z-API)
+    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/send-message'
     payload = {
         'phone': numero,
         'message': resposta_final
