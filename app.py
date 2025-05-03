@@ -45,13 +45,17 @@ def webhook():
 
     resposta_final = response.choices[0].message.content
 
-    # Enviar resposta pelo WhatsApp (Z-API) - formato ANTIGO com token na URL
-    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/token/{ZAPI_TOKEN}/send-text'
+    # NOVO formato da URL + cabeçalho
+    url = f'https://api.z-api.io/instances/{ZAPI_PHONE_ID}/send-text'
     payload = {
         'phone': numero,
         'message': resposta_final
     }
-    response_zapi = requests.post(url, json=payload)
+    headers = {
+        'Client-Token': ZAPI_TOKEN
+    }
+
+    response_zapi = requests.post(url, json=payload, headers=headers)
     print("DEBUG - ZAPI status code:", response_zapi.status_code)
     print("DEBUG - ZAPI response text:", response_zapi.text)
 
