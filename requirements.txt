@@ -1,5 +1,5 @@
-flask>=2.0.0 # Versão mínima recomendada para compatibilidade geral
-requests>=2.25.0 # Versão com bom suporte e estabilidade
-openai>=1.0.0   # Essencial para a nova API da OpenAI usada no script
-gunicorn>=20.0.0 # Para deploy em produção (opcional para teste local)
+flask
+requests
+openai>=1.0.0
+gunicorn
 
