@@ -7,7 +7,7 @@ import logging
 app = Flask(__name__)
 
 # Configuração de logging
-logging.basicConfig(level=logging.INFO, format=\'%(asctime)s - %(levelname)s - %(message)s\')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Configurações - Pegando dados das variáveis de ambiente
 WATI_API_KEY = os.environ.get(\'WATI_API_KEY\')
